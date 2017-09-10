@@ -1,0 +1,21 @@
+---
+:concurrency: 20
+:queues:
+  - pull
+  - mailers
+:schedule:
+  subscriptions_scheduler:
+    cron: '0 13 * * *'
+    class: Scheduler::SubscriptionsScheduler
+  media_cleanup_scheduler:
+    cron: '0 12 * * *'
+    class: Scheduler::MediaCleanupScheduler
+  feed_cleanup_scheduler:
+    cron: '0 15 * * *'
+    class: Scheduler::FeedCleanupScheduler
+  doorkeeper_cleanup_scheduler:
+    cron: '1 11 * * 0'
+    class: Scheduler::DoorkeeperCleanupScheduler
+  user_cleanup_scheduler:
+    cron: '4 5 * * *'
+    class: Scheduler::UserCleanupScheduler
