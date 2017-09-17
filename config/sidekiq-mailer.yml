@@ -1,5 +1,5 @@
 ---
-:concurrency: 20
+:concurrency: 10
 :queues:
   - pull
   - mailers
@@ -22,4 +22,6 @@
   subscriptions_cleanup_scheduler:
     cron: '0 2 * * 0'
     class: Scheduler::SubscriptionsCleanupScheduler
-
+  ip_cleanup_scheduler:
+    cron: '<%= Random.rand(0..59) %> <%= Random.rand(10..12) %> * * *'
+    class: Scheduler::IpCleanupScheduler
