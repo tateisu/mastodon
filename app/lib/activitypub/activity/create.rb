@@ -80,7 +80,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     return if tag['href'].blank?
 
     account = account_from_uri(tag['href'])
-    account = FetchRemoteAccountService.new.call(tag['href']) if account.nil?
+    account = FetchRemoteAccountService.new.call(tag['href'], id: false) if account.nil?
     return if account.nil?
     account.mentions.create(status: status)
   end
@@ -105,7 +105,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
       next if unsupported_media_type?(attachment['mediaType']) || attachment['url'].blank?
 
       href             = Addressable::URI.parse(attachment['url']).normalize.to_s
-      media_attachment = MediaAttachment.create(status: status, account: status.account, remote_url: href)
+      media_attachment = MediaAttachment.create(status: status, account: status.account, remote_url: href, description: attachment['name'].presence)
 
       next if skip_download?
 
