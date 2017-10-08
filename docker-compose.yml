@@ -36,10 +36,8 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
-      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
+      - /mnt/hdd/mastodon/public:/mastodon/public
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
-      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
 
   streaming:
     build: .
@@ -64,7 +62,7 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
+      - /mnt/hdd/mastodon/public:/mastodon/public
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
       - /mnt/hdd/mastodon/mastodon1/config/sidekiq-mailer.yml:/mastodon/config/sidekiq.yml
       
@@ -78,7 +76,7 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
+      - /mnt/hdd/mastodon/public:/mastodon/public
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
       - /mnt/hdd/mastodon/mastodon1/config/sidekiq-push.yml:/mastodon/config/sidekiq.yml
 
@@ -92,6 +90,6 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
+      - /mnt/hdd/mastodon/public:/mastodon/public
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
       - /mnt/hdd/mastodon/mastodon1/config/sidekiq-default.yml:/mastodon/config/sidekiq.yml
