@@ -5,7 +5,7 @@ services:
   db_backend:
 #  db:
     restart: always
-    image: postgres:9.6.5-alpine
+    image: postgres:9.6-alpine
     volumes:
       - /mnt/hdd/mastodon/postgres:/var/lib/postgresql/data
 
@@ -21,7 +21,7 @@ services:
 
   redis:
     restart: always
-    image: redis:alpine
+    image: redis:4.0-alpine
 ### Uncomment to enable REDIS persistance
     volumes:
       - /mnt/hdd/mastodon/redis:/data
