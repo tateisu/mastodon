@@ -36,9 +36,12 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/public:/mastodon/public
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
-
+      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
+      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
+      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
+      - /mnt/hdd/mastodon/public/500.html:/mastodon/public/500.html
+   
   streaming:
     build: .
     image: gargron/mastodon
@@ -62,9 +65,10 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/public:/mastodon/public
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
-      - /mnt/hdd/mastodon/mastodon1/config/sidekiq-mailer.yml:/mastodon/config/sidekiq.yml
+      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
+      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
+      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
       
   sidekiq_push:
     build: .
@@ -76,9 +80,10 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/public:/mastodon/public
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
-      - /mnt/hdd/mastodon/mastodon1/config/sidekiq-push.yml:/mastodon/config/sidekiq.yml
+      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
+      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
+      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
 
   sidekiq_default:
     build: .
@@ -90,6 +95,7 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/public:/mastodon/public
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
-      - /mnt/hdd/mastodon/mastodon1/config/sidekiq-default.yml:/mastodon/config/sidekiq.yml
+      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
+      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
+      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
