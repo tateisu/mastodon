@@ -5,7 +5,7 @@ services:
   db_backend:
 #  db:
     restart: always
-    image: postgres:alpine
+    image: postgres:9.6.5-alpine
     volumes:
       - /mnt/hdd/mastodon/postgres:/var/lib/postgresql/data
 
