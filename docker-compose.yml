@@ -69,6 +69,7 @@ services:
       - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
       - /mnt/hdd/mastodon/public/system:/mastodon/public/system
       - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
+      - config/sidekiq-mailer.yml:config/sidekiq.yml
       
   sidekiq_push:
     build: .
@@ -84,6 +85,7 @@ services:
       - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
       - /mnt/hdd/mastodon/public/system:/mastodon/public/system
       - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
+      - config/sidekiq-push.yml:config/sidekiq.yml
 
   sidekiq_default:
     build: .
@@ -99,3 +101,4 @@ services:
       - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
       - /mnt/hdd/mastodon/public/system:/mastodon/public/system
       - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
+      - config/sidekiq-default.yml:config/sidekiq.yml
