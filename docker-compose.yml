@@ -36,7 +36,7 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
+      - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
       - /mnt/hdd/mastodon/public/system:/mastodon/public/system
       - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
@@ -65,11 +65,11 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
-      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
-      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
-      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
-      - config/sidekiq-mailer.yml:config/sidekiq.yml
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-mailer.yml:/mastodon/config/sidekiq.yml:ro
       
   sidekiq_push:
     build: .
@@ -81,11 +81,11 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
-      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
-      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
-      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
-      - config/sidekiq-push.yml:config/sidekiq.yml
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-push.yml:/mastodon/config/sidekiq.yml:ro
 
   sidekiq_default:
     build: .
@@ -97,8 +97,8 @@ services:
       - db
       - redis
     volumes:
-      - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7
-      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
-      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
-      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
-      - config/sidekiq-default.yml:config/sidekiq.yml
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-default.yml:/mastodon/config/sidekiq.yml:ro
