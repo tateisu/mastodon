@@ -10,7 +10,7 @@ services:
 
   db:
     restart: always
-    image: gavinmroy/alpine-pgbouncer
+    image: gavinmroy/alpine-pgbouncer:1.7.2
     volumes:
       - /mnt/hdd/mastodon/pgbouncer:/etc/pgbouncer
     ports:
@@ -36,6 +36,7 @@ services:
       - db
       - redis
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
       - /mnt/hdd/mastodon/public/system:/mastodon/public/system
@@ -65,6 +66,7 @@ services:
       - db
       - redis
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
@@ -81,6 +83,7 @@ services:
       - db
       - redis
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
@@ -97,6 +100,7 @@ services:
       - db
       - redis
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
