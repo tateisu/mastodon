@@ -6,13 +6,13 @@ services:
     restart: always
     image: postgres:9.6-alpine
     volumes:
-      - /mnt/hdd/mastodon/postgres:/var/lib/postgresql/data
+      - ../postgres:/var/lib/postgresql/data
 
   db:
     restart: always
     image: gavinmroy/alpine-pgbouncer:1.7.2
     volumes:
-      - /mnt/hdd/mastodon/pgbouncer:/etc/pgbouncer
+      - ../pgbouncer:/etc/pgbouncer
     ports:
       - "172.17.0.1:5432:5432"
     depends_on:
@@ -22,7 +22,7 @@ services:
     restart: always
     image: redis:4.0-alpine
     volumes:
-      - /mnt/hdd/mastodon/redis:/data
+      - ../redis:/data
 
   web:
     build: .
@@ -37,11 +37,11 @@ services:
       - redis
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/hdd/mastodon/etc-ImageMagick-7:/etc/ImageMagick-7:ro
-      - /mnt/hdd/mastodon/public/assets:/mastodon/public/assets
-      - /mnt/hdd/mastodon/public/system:/mastodon/public/system
-      - /mnt/hdd/mastodon/public/packs:/mastodon/public/packs
-      - /mnt/hdd/mastodon/public/500.html:/mastodon/public/500.html
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ../public/500.html:/mastodon/public/500.html
    
   streaming:
     build: .
