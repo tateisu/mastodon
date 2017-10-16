@@ -41,7 +41,6 @@ services:
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
       - ../public/packs:/mastodon/public/packs
-      - ../public/500.html:/mastodon/public/500.html
    
   streaming:
     build: .
