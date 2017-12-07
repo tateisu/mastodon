@@ -440,11 +440,6 @@
     position: absolute;
     right: 5px;
     top: 5px;
-
-    ::-webkit-scrollbar-track:hover,
-    ::-webkit-scrollbar-track:active {
-      background-color: rgba($base-overlay-background, 0.3);
-    }
   }
 }
 
@@ -517,7 +512,6 @@
   font-weight: 400;
   overflow: hidden;
   white-space: pre-wrap;
-  padding-top: 5px;
 
   &.status__content--with-spoiler {
     white-space: normal;
@@ -530,7 +524,7 @@
   .emojione {
     width: 20px;
     height: 20px;
-    margin: -5px 0 0;
+    margin: -3px 0 0;
   }
 
   p {
@@ -766,7 +760,7 @@
 .status__action-bar {
   align-items: center;
   display: flex;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .status__action-bar-button {
@@ -799,7 +793,7 @@
     .emojione {
       width: 24px;
       height: 24px;
-      margin: -5px 0 0;
+      margin: -3px 0 0;
     }
   }
 
@@ -4467,6 +4461,10 @@ noscript {
     input {
       width: 100%;
       margin-bottom: 6px;
+
+      &:focus {
+        outline: 0;
+      }
     }
   }
 
@@ -4491,8 +4489,12 @@ noscript {
   flex-direction: column;
   border-radius: 8px;
   box-shadow: 2px 4px 15px rgba($base-shadow-color, 0.4);
-  width: 40vh;
+  width: 380px;
   overflow: hidden;
+
+  @media screen and (max-width: 420px) {
+    width: 90%;
+  }
 
   h4 {
     padding: 15px 0;
