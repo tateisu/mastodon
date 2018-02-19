@@ -1,1 +1,2 @@
 default: styles/application.scss
+river: styles/application_river.scss
