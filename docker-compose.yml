@@ -17,8 +17,6 @@ services:
       - internal_network
     volumes:
       - ../pgbouncer:/etc/pgbouncer
-    ports:
-      - "172.17.0.1:5432:5432"
     depends_on:
       - db_backend
 
@@ -85,6 +83,9 @@ services:
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
+    networks:
+      - external_network
+      - internal_network
     depends_on:
       - db
       - redis
@@ -102,6 +103,9 @@ services:
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
+    networks:
+      - external_network
+      - internal_network
     depends_on:
       - db
       - redis
@@ -119,12 +123,12 @@ services:
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq 
-    depends_on:
-      - db
-      - redis
     networks:
       - external_network
       - internal_network
+    depends_on:
+      - db
+      - redis
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
