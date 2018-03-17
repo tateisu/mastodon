@@ -28,7 +28,6 @@ RUN apk -U upgrade \
     postgresql-dev \
     protobuf-dev \
     python \
-    valgrind gdb \
  && apk add \
     ca-certificates \
     ffmpeg \
