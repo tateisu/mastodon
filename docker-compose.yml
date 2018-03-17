@@ -19,6 +19,9 @@ services:
       - ../pgbouncer:/etc/pgbouncer
     depends_on:
       - db_backend
+## expose port for munin
+    ports:
+      - "172.17.0.1:5432:5432"
 
   redis:
     restart: always
@@ -140,4 +143,5 @@ services:
 networks:
   external_network:
   internal_network:
-    internal: true
+# for access from munin
+# internal: true
