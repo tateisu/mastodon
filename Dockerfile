@@ -64,9 +64,6 @@ RUN apk -U upgrade \
 
 COPY Gemfile Gemfile.lock package.json yarn.lock .yarnclean /mastodon/
 
-RUN mkdir -p /usr/local/share/.config/yarn/global/
-RUN touch /usr/local/share/.config/yarn/global/.yarnclean
-
 RUN bundle config build.nokogiri --with-iconv-lib=/usr/local/lib --with-iconv-include=/usr/local/include \
  && bundle install -j$(getconf _NPROCESSORS_ONLN) --deployment --without test development \
  && yarn --pure-lockfile \
