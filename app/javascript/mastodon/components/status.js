@@ -31,6 +31,8 @@ export default class Status extends ImmutablePureComponent {
     onFavourite: PropTypes.func,
     onReblog: PropTypes.func,
     onDelete: PropTypes.func,
+    onDirect: PropTypes.func,
+    onMention: PropTypes.func,
     onPin: PropTypes.func,
     onOpenMedia: PropTypes.func,
     onOpenVideo: PropTypes.func,
@@ -118,6 +120,10 @@ export default class Status extends ImmutablePureComponent {
 
   handleHotkeyMoveDown = () => {
     this.props.onMoveDown(this.props.status.get('id'));
+  }
+
+  handleHotkeyToggleHidden = () => {
+    this.props.onToggleHidden(this._properStatus());
   }
 
   _properStatus () {
@@ -222,6 +228,7 @@ export default class Status extends ImmutablePureComponent {
       openProfile: this.handleHotkeyOpenProfile,
       moveUp: this.handleHotkeyMoveUp,
       moveDown: this.handleHotkeyMoveDown,
+      toggleHidden: this.handleHotkeyToggleHidden,
     };
 
     return (
