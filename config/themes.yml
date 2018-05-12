@@ -1,2 +1,3 @@
 default: styles/application.scss
+contrast: styles/contrast.scss
 river: styles/application_river.scss
