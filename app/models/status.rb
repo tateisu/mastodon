@@ -76,14 +76,8 @@ class Status < ApplicationRecord
   scope :without_reblogs, -> { where('statuses.reblog_of_id IS NULL') }
   scope :with_public_visibility, -> { where(visibility: :public) }
   scope :tagged_with, ->(tag) { joins(:statuses_tags).where(statuses_tags: { tag_id: tag }) }
-  scope :excluding_silenced_accounts, -> {
-    # constant expression is required to use partial index
-    left_outer_joins(:account).where(Account.arel_table[:silenced].not_eq(true))
-  }
-  scope :including_silenced_accounts, -> {
-    # constant expression is required to use partial index
-    left_outer_joins(:account).where(Account.arel_table[:silenced].eq(true))
-  }
+  scope :excluding_silenced_accounts, -> { left_outer_joins(:account).where(accounts: { silenced: false }) }
+  scope :including_silenced_accounts, -> { left_outer_joins(:account).where(accounts: { silenced: true }) }
   scope :not_excluded_by_account, ->(account) { where.not(account_id: account.excluded_from_timeline_account_ids) }
   scope :not_domain_blocked_by_account, ->(account) { account.excluded_from_timeline_domains.blank? ? left_outer_joins(:account) : left_outer_joins(:account).where('accounts.domain IS NULL OR accounts.domain NOT IN (?)', account.excluded_from_timeline_domains) }
 
@@ -195,7 +189,6 @@ class Status < ApplicationRecord
     end
 
     def as_direct_timeline_from_me(account)
-
       # constant expression is required to use partial index
       where(account_id: account.id)
         .where(Status.arel_table[:visibility].eq(3))
@@ -204,12 +197,10 @@ class Status < ApplicationRecord
     end
 
     def as_direct_timeline_to_me(account)
-
       # constant expression is required to use partial index
       query = Status
               .joins(:mentions)
               .merge(Mention.where(account_id: account.id))
-              .where(Mention.arel_table[:direct].eq(true))
               .where(Status.arel_table[:visibility].eq(3))
 
       # direct timeline is not public.
