@@ -188,27 +188,38 @@ class Status < ApplicationRecord
       where(account: [account] + account.following).where(visibility: [:public, :unlisted, :private])
     end
 
-    def as_direct_timeline_from_me(account)
+    def as_direct_timeline(account, limit = 20, max_id = nil, since_id = nil)
       # constant expression is required to use partial index
-      where(account_id: account.id)
-        .where(Status.arel_table[:visibility].eq(3))
-
       # _from_me part does not require any timeline filters
-    end
+      query_from_me = where(account_id: account.id)
+                      .where(Status.arel_table[:visibility].eq(3))
+                      .limit(limit)
 
-    def as_direct_timeline_to_me(account)
       # constant expression is required to use partial index
-      query = Status
-              .joins(:mentions)
-              .merge(Mention.where(account_id: account.id))
-              .where(Status.arel_table[:visibility].eq(3))
-
       # direct timeline is not public.
       # this TL does not require filtering by silence, languages, domain_block
       # but mute and block should be applied
-      query.not_excluded_by_account(account)
-
       # FIXME: may we check mutes.hide_notifications?
+      query_to_me = Status
+                    .joins(:mentions)
+                    .merge(Mention.where(account_id: account.id))
+                    .where(Status.arel_table[:visibility].eq(3))
+                    .limit(limit)
+                    .not_excluded_by_account(account)
+
+      if max_id.present?
+        query_from_me = query_from_me.where('mentions.status_id < ?', max_id)
+        query_to_me = query_to_me.where('mentions.status_id < ?', max_id)
+      end
+
+      if since_id.present?
+        query_from_me = query_from_me.where('mentions.status_id > ?', since_id)
+        query_to_me = query_to_me.where('mentions.status_id > ?', since_id)
+      end
+
+      result = (query_from_me.to_a + query_to_me.to_a).uniq(&:id).sort_by(&:id).reverse.take(limit)
+      logger.debug result.inspect
+      result
     end
 
     def as_public_timeline(account = nil, local_only = false)
