@@ -318,7 +318,7 @@ RSpec.describe Status, type: :model do
       @followed_direct_status = Fabricate(:status, account: followed, visibility: :direct)
       @not_followed_direct_status = Fabricate(:status, account: not_followed, visibility: :direct)
 
-      @results = Status.as_direct_timeline_from_me(account)
+      @results = Status.as_direct_timeline(account)
     end
 
     it 'does not include public statuses from self' do
