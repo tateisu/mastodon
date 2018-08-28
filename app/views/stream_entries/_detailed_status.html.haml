@@ -21,7 +21,7 @@
   - if !status.media_attachments.empty?
     - if status.media_attachments.first.video?
       - video = status.media_attachments.first
-      = react_component :video, src: video.file.url(:original), preview: video.file.url(:small), sensitive: status.sensitive? && !current_account&.user&.setting_display_sensitive_media, width: 670, height: 380, detailed: true, inline: true
+      = react_component :video, src: video.file.url(:original), preview: video.file.url(:small), sensitive: status.sensitive? && !current_account&.user&.setting_display_sensitive_media, width: 670, height: 380, detailed: true, inline: true, alt: video.description
     - else
       = react_component :media_gallery, height: 380, sensitive: status.sensitive? && !current_account&.user&.setting_display_sensitive_media, standalone: true, 'autoPlayGif': current_account&.user&.setting_auto_play_gif, 'reduceMotion': current_account&.user&.setting_reduce_motion, media: status.media_attachments.map { |a| ActiveModelSerializers::SerializableResource.new(a, serializer: REST::MediaAttachmentSerializer).as_json }
   - elsif status.preview_cards.first
@@ -39,6 +39,11 @@
       - else
         = link_to status.application.name, status.application.website, class: 'detailed-status__application', target: '_blank', rel: 'noopener'
       ·
+    = link_to remote_interaction_path(status), class: 'modal-button detailed-status__link' do
+      = fa_icon('reply')
+      %span.detailed-status__reblogs>= number_to_human status.replies_count, strip_insignificant_zeros: true
+      = " "
+    ·
     - if status.direct_visibility?
       %span.detailed-status__link<
         = fa_icon('envelope')
@@ -46,13 +51,15 @@
       %span.detailed-status__link<
         = fa_icon('lock')
     - else
-      %span.detailed-status__link<
+      = link_to remote_interaction_path(status), class: 'modal-button detailed-status__link' do
         = fa_icon('retweet')
-        %span.detailed-status__reblogs= number_to_human status.reblogs_count, strip_insignificant_zeros: true
+        %span.detailed-status__reblogs>= number_to_human status.reblogs_count, strip_insignificant_zeros: true
+        = " "
     ·
-    %span.detailed-status__link<
+    = link_to remote_interaction_path(status), class: 'modal-button detailed-status__link' do
       = fa_icon('star')
-      %span.detailed-status__favorites= number_to_human status.favourites_count, strip_insignificant_zeros: true
+      %span.detailed-status__favorites>= number_to_human status.favourites_count, strip_insignificant_zeros: true
+      = " "
 
     - if user_signed_in?
       ·
