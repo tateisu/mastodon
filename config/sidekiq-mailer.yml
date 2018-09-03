@@ -1,8 +1,8 @@
 ---
 :concurrency: 10
 :queues:
-  - pull
   - mailers
+  - pull
 :schedule:
   subscriptions_scheduler:
     cron: '0 13 * * *'
