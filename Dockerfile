@@ -83,6 +83,6 @@ VOLUME /mastodon/public/system
 
 USER mastodon
 
-RUN OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder bundle exec rails assets:precompile
+# RUN OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder bundle exec rails assets:precompile
 
 ENTRYPOINT ["/sbin/tini", "--"]
