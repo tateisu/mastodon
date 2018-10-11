@@ -91,7 +91,6 @@ gem 'webpush'
 
 gem 'json-ld', '~> 2.2'
 gem 'rdf-normalize', '~> 0.3'
-gem 'faraday'
 
 group :development, :test do
   gem 'fabrication', '~> 2.20'
