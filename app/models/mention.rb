@@ -9,6 +9,7 @@
 #  updated_at :datetime         not null
 #  account_id :bigint(8)
 #  direct     :boolean          default(FALSE), not null
+#  silent     :boolean          default(FALSE), not null
 #
 
 class Mention < ApplicationRecord
@@ -18,6 +19,9 @@ class Mention < ApplicationRecord
   has_one :notification, as: :activity, dependent: :destroy
 
   validates :account, uniqueness: { scope: :status }
+
+  scope :active, -> { where(silent: false) }
+  scope :silent, -> { where(silent: true) }
 
   delegate(
     :username,
@@ -32,4 +36,9 @@ class Mention < ApplicationRecord
     self.direct = status.direct_visibility?
     self
   end
+
+  def active?
+    !silent?
+  end
+
 end
