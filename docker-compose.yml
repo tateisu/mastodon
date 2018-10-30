@@ -80,7 +80,7 @@ services:
       - redis
 
 
-  sidekiq_mailers:
+  sidekiq_pull:
     build: .
     image: gargron/mastodon
     restart: always
@@ -98,7 +98,7 @@ services:
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
       - ../public/packs:/mastodon/public/packs
-      - ./config/sidekiq-mailer.yml:/mastodon/config/sidekiq.yml:ro
+      - ./config/sidekiq-pull.yml:/mastodon/config/sidekiq.yml:ro
       
   sidekiq_push:
     build: .
