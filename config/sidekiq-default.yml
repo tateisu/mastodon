@@ -2,4 +2,3 @@
 :concurrency: 20
 :queues:
   - default
-:schedule:
