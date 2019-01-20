@@ -4,6 +4,9 @@
   - [push, 4]
   - [mailers, 1]
 :schedule:
+  scheduled_statuses_scheduler:
+    every: '5m'
+    class: Scheduler::ScheduledStatusesScheduler
   subscriptions_scheduler:
     cron: '0 13 * * *'
     class: Scheduler::SubscriptionsScheduler
@@ -34,4 +37,3 @@
   pghero_scheduler:
     cron: '0 0 * * *'
     class: Scheduler::PgheroScheduler
-
