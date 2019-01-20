@@ -96,5 +96,4 @@ class Auth::RegistrationsController < Devise::RegistrationsController
   def set_sessions
     @sessions = current_user.session_activations
   end
-
 end
