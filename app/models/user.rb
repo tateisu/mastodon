@@ -107,13 +107,14 @@ class User < ApplicationRecord
            :expand_spoilers, :default_language, :aggregate_reblogs, :show_application, to: :settings, prefix: :setting, allow_nil: false
 
   attr_reader :invite_code
+  attr_writer :external
 
   def confirmed?
     confirmed_at.present?
   end
 
   def invited?
-    invite_id.present?
+    invite_id.present? && invite.valid_for_use?
   end
 
   def disable!
@@ -189,6 +190,10 @@ class User < ApplicationRecord
 
   def allows_report_emails?
     settings.notification_emails['report']
+  end
+
+  def allows_pending_account_emails?
+    settings.notification_emails['pending_account']
   end
 
   def hides_network?
@@ -269,11 +274,15 @@ class User < ApplicationRecord
   private
 
   def set_approved
-    self.approved = open_registrations? || invited?
+    self.approved = open_registrations? || invited? || external?
   end
 
   def open_registrations?
     Setting.registrations_mode == 'open'
+  end
+
+  def external?
+    !!@external
   end
 
   def sanitize_languages
@@ -295,7 +304,7 @@ class User < ApplicationRecord
 
   def notify_staff_about_pending_account!
     User.staff.includes(:account).each do |u|
-      next unless u.allows_report_emails?
+      next unless u.allows_pending_account_emails?
       AdminMailer.new_pending_account(u.account, self).deliver_later
     end
   end
