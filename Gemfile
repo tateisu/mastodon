@@ -66,7 +66,7 @@ gem 'ox', '~> 2.10'
 gem 'posix-spawn', git: 'https://github.com/rtomayko/posix-spawn', ref: '58465d2e213991f8afb13b984854a49fcdcc980c'
 gem 'pundit', '~> 2.0'
 gem 'premailer-rails'
-gem 'rack-attack', '~> 5.4'
+gem 'rack-attack', '~> 6.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 gem 'rails-i18n', '~> 5.1'
 gem 'rails-settings-cached', '~> 0.6'
@@ -116,7 +116,7 @@ group :test do
   gem 'rspec-sidekiq', '~> 3.0'
   gem 'simplecov', '~> 0.16', require: false
   gem 'webmock', '~> 3.5'
-  gem 'parallel_tests', '~> 2.28'
+  gem 'parallel_tests', '~> 2.29'
 end
 
 group :development do
@@ -131,7 +131,7 @@ group :development do
   gem 'rubocop', '~> 0.68', require: false
   gem 'brakeman', '~> 4.5', require: false
   gem 'bundler-audit', '~> 0.6', require: false
-  gem 'scss_lint', '~> 0.57', require: false
+  gem 'scss_lint', '~> 0.58', require: false
 
   gem 'capistrano', '~> 3.11'
   gem 'capistrano-rails', '~> 1.4'
