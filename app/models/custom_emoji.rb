@@ -28,7 +28,7 @@ class CustomEmoji < ApplicationRecord
     :(#{SHORTCODE_RE_FRAGMENT}):
     (?=[^[:alnum:]:]|$)/x
 
-  IMAGE_MIME_TYPES = %w(image/png image/gif image/webp).freeze
+  IMAGE_MIME_TYPES = %w(image/png image/gif).freeze
 
   belongs_to :category, class_name: 'CustomEmojiCategory', optional: true
   has_one :local_counterpart, -> { where(domain: nil) }, class_name: 'CustomEmoji', primary_key: :shortcode, foreign_key: :shortcode
@@ -57,6 +57,12 @@ class CustomEmoji < ApplicationRecord
 
   def object_type
     :emoji
+  end
+
+  def copy!
+    copy = self.class.find_or_initialize_by(domain: nil, shortcode: shortcode)
+    copy.image = image
+    copy.save!
   end
 
   class << self
