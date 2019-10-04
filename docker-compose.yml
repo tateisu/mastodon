@@ -1,15 +1,31 @@
 version: '3'
 services:
 
-  db:
+
+
+  db_backend:
     restart: always
-    image: postgres:9.6-alpine
+    image: postgres:11.1-alpine
     networks:
       - internal_network
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - ../postgres:/var/lib/postgresql/data
+
+  db:
+    restart: always
+    image: gavinmroy/alpine-pgbouncer:1.7.2
+    networks:
+      - internal_network
+    volumes:
+      - ../pgbouncer:/etc/pgbouncer
+    depends_on:
+      - db_backend
+## expose port for munin
+    ports:
+      - "172.17.0.1:5432:5432"
+
 
   redis:
     restart: always
@@ -19,7 +35,7 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
     volumes:
-      - ./redis:/data
+      - ../redis:/data
 
 #  es:
 #    restart: always
@@ -45,13 +61,17 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:3000/health || exit 1"]
     ports:
-      - "127.0.0.1:3000:3000"
+      - "172.17.0.1:3000:3000"
     depends_on:
       - db
       - redis
 #      - es
     volumes:
-      - ./public/system:/mastodon/public/system
+      - /etc/localtime:/etc/localtime:ro
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
 
   streaming:
     build: .
@@ -65,25 +85,71 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:4000/api/v1/streaming/health || exit 1"]
     ports:
-      - "127.0.0.1:4000:4000"
+      - "172.17.0.1:4000:4000"
     depends_on:
       - db
       - redis
 
-  sidekiq:
+  sidekiq_pull:
     build: .
     image: tootsuite/mastodon
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
-    depends_on:
-      - db
-      - redis
     networks:
       - external_network
       - internal_network
+    depends_on:
+      - db
+      - redis
     volumes:
-      - ./public/system:/mastodon/public/system
+      - /etc/localtime:/etc/localtime:ro
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-pull.yml:/mastodon/config/sidekiq.yml:ro
+
+  sidekiq_push:
+    build: .
+    image: tootsuite/mastodon
+    restart: always
+    env_file: .env.production
+    command: bundle exec sidekiq
+    networks:
+      - external_network
+      - internal_network
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-push.yml:/mastodon/config/sidekiq.yml:ro
+
+  sidekiq_default:
+    build: .
+    image: tootsuite/mastodon
+    restart: always
+    env_file: .env.production
+    command: bundle exec sidekiq
+    networks:
+      - external_network
+      - internal_network
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-default.yml:/mastodon/config/sidekiq.yml:ro
+
 ## Uncomment to enable federation with tor instances along with adding the following ENV variables
 ## http_proxy=http://privoxy:8118
 ## ALLOW_ACCESS_TO_HIDDEN_SERVICE=true
@@ -104,4 +170,5 @@ services:
 networks:
   external_network:
   internal_network:
-    internal: true
+# for access from munin
+# internal: true

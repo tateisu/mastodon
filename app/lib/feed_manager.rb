@@ -5,8 +5,9 @@ require 'singleton'
 class FeedManager
   include Singleton
   include Redisable
-
-  MAX_ITEMS = 400
+  
+  MAX_ITEMS = ENV['FEED_MAX_ITEMS'].present? ? ENV['FEED_MAX_ITEMS'].to_i : 400
+  TRIM_INTERVAL = ENV['FEED_TRIM_INTERVAL'].present? ? ENV['FEED_TRIM_INTERVAL'].to_i : 1
 
   # Must be <= MAX_ITEMS or the tracking sets will grow forever
   REBLOG_FALLOFF = 40
@@ -62,6 +63,8 @@ class FeedManager
     timeline_key = key(type, account_id)
     reblog_key   = key(type, account_id, 'reblogs')
 
+    return unless redis.zcard(key(type, account_id)) >= FeedManager::MAX_ITEMS + FeedManager::TRIM_INTERVAL
+    
     # Remove any items past the MAX_ITEMS'th entry in our feed
     redis.zremrangebyrank(timeline_key, 0, -(FeedManager::MAX_ITEMS + 1))
 

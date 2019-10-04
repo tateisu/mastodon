@@ -116,9 +116,9 @@ ENV BIND="0.0.0.0"
 USER mastodon
 
 # Precompile assets
-RUN cd ~ && \
-	OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder rails assets:precompile && \
-	yarn cache clean
+# RUN cd ~ && \
+#	OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder rails assets:precompile && \
+#	yarn cache clean
 
 # Set the work dir and the container entry point
 WORKDIR /opt/mastodon
