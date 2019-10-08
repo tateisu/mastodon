@@ -10,7 +10,7 @@ defaults: &defaults
   site_contact_username: ''
   site_contact_email: ''
   registrations_mode: 'open'
-  open_registrations_api: false
+  open_registrations_api: true
   profile_directory: true
   closed_registrations_message: ''
   open_deletion: true
