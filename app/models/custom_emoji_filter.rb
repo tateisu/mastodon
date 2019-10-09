@@ -8,7 +8,7 @@ class CustomEmojiFilter
   end
 
   def results
-    scope = CustomEmoji.alphabetic
+    scope = CustomEmoji.order(shortcode: :asc,domain: :asc)
 
     params.each do |key, value|
       next if key.to_s == 'page'
