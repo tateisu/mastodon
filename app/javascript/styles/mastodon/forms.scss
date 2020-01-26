@@ -222,6 +222,12 @@ code {
     }
   }
 
+  .input.datetime .label_input select {
+    display: inline-block;
+    width: auto;
+    flex: 0;
+  }
+
   .required abbr {
     text-decoration: none;
     color: lighten($error-value-color, 12%);
@@ -414,7 +420,6 @@ code {
     line-height: inherit;
     height: auto;
     padding: 10px;
-    text-transform: uppercase;
     text-decoration: none;
     text-align: center;
     box-sizing: border-box;
@@ -657,7 +662,6 @@ code {
 
   a {
     color: $highlight-text-color;
-    text-transform: uppercase;
     text-decoration: none;
     font-weight: 700;
 
