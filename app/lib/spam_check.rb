@@ -135,7 +135,7 @@ class SpamCheck
 
   def auto_report_status!
     status_ids = Status.where(visibility: %i(public unlisted)).where(id: matching_status_ids).pluck(:id) + [@status.id] if @status.distributable?
-    ReportService.new.call(Account.representative, @account, status_ids: status_ids, comment: I18n.t('spam_check.spam_detected_and_silenced'))
+    ReportService.new.call(Account.representative, @account, status_ids: status_ids, comment: I18n.t('spam_check.spam_detected'))
   end
 
   def already_flagged?
@@ -143,7 +143,7 @@ class SpamCheck
   end
 
   def trusted?
-    @account.trust_level > Account::TRUST_LEVELS[:untrusted]
+    @account.trust_level > Account::TRUST_LEVELS[:untrusted] || (@account.local? && @account.user_staff?)
   end
 
   def no_unsolicited_mentions?

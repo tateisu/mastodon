@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+Paperclip::DataUriAdapter.register
+
 Paperclip.interpolates :filename do |attachment, style|
   if style == :original
     attachment.original_filename
@@ -52,7 +54,7 @@ if ENV['S3_ENABLED'] == 'true'
   if ENV.has_key?('S3_ENDPOINT')
     Paperclip::Attachment.default_options[:s3_options].merge!(
       endpoint: ENV['S3_ENDPOINT'],
-      force_path_style: true
+      force_path_style: ENV['S3_OVERRIDE_PATH_STYLE'] != 'true',
     )
 
     Paperclip::Attachment.default_options[:url] = ':s3_path_url'
@@ -89,7 +91,7 @@ else
   Paperclip::Attachment.default_options.merge!(
     storage: :filesystem,
     use_timestamp: true,
-    path: ENV.fetch('PAPERCLIP_ROOT_PATH', ':rails_root/public/system') + '/:class/:attachment/:id_partition/:style/:filename',
+    path: File.join(ENV.fetch('PAPERCLIP_ROOT_PATH', File.join(':rails_root', 'public', 'system')), ':class', ':attachment', ':id_partition', ':style', ':filename'),
     url: ENV.fetch('PAPERCLIP_ROOT_URL', '/system') + '/:class/:attachment/:id_partition/:style/:filename',
   )
 end
