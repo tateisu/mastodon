@@ -17,6 +17,7 @@ module Mastodon
     option :concurrency, type: :numeric, default: 5, aliases: [:c]
     option :verbose, type: :boolean, default: false, aliases: [:v]
     option :dry_run, type: :boolean, default: false
+    option :backtrace, type: :boolean, default: false
     desc 'remove', 'Remove remote media files'
     long_desc <<-DESC
       Removes locally cached copies of media attachments from other servers.
@@ -31,7 +32,7 @@ module Mastodon
       processed, aggregate = parallelize_with_progress(MediaAttachment.cached.where.not(remote_url: '').where('created_at < ?', time_ago)) do |media_attachment|
         next if media_attachment.file.blank?
 
-        size = media_attachment.file_file_size + (media_attachment.thumbnail_file_size || 0)
+        size = (media_attachment.file_file_size || 0) + (media_attachment.thumbnail_file_size || 0)
 
         unless options[:dry_run]
           media_attachment.file.destroy
