@@ -20,7 +20,7 @@ class Api::V1::AccountsController < Api::BaseController
   end
 
   def create
-    token    = AppSignUpService.new.call(doorkeeper_token.application, account_params)
+    token    = AppSignUpService.new.call(doorkeeper_token.application, request.remote_ip, account_params)
     response = Doorkeeper::OAuth::TokenResponse.new(token)
 
     headers.merge!(response.headers)
@@ -30,9 +30,8 @@ class Api::V1::AccountsController < Api::BaseController
   end
 
   def follow
-    FollowService.new.call(current_user.account, @account, reblogs: truthy_param?(:reblogs), with_rate_limit: true)
-
-    options = @account.locked? || current_user.account.silenced? ? {} : { following_map: { @account.id => { reblogs: truthy_param?(:reblogs) } }, requested_map: { @account.id => false } }
+    follow  = FollowService.new.call(current_user.account, @account, reblogs: params.key?(:reblogs) ? truthy_param?(:reblogs) : nil, notify: params.key?(:notify) ? truthy_param?(:notify) : nil, with_rate_limit: true)
+    options = @account.locked? || current_user.account.silenced? ? {} : { following_map: { @account.id => { reblogs: follow.show_reblogs?, notify: follow.notify? } }, requested_map: { @account.id => false } }
 
     render json: @account, serializer: REST::RelationshipSerializer, relationships: relationships(options)
   end
@@ -43,7 +42,7 @@ class Api::V1::AccountsController < Api::BaseController
   end
 
   def mute
-    MuteService.new.call(current_user.account, @account, notifications: truthy_param?(:notifications))
+    MuteService.new.call(current_user.account, @account, notifications: truthy_param?(:notifications), duration: (params[:duration] || 0))
     render json: @account, serializer: REST::RelationshipSerializer, relationships: relationships
   end
 

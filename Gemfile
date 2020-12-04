@@ -5,14 +5,11 @@ ruby '>= 2.5.0', '< 3.0.0'
 
 gem 'pkg-config', '~> 1.4'
 
-gem 'puma', '~> 4.3'
-gem 'rails', '~> 5.2.4.3'
+gem 'puma', '~> 5.0'
+gem 'rails', '~> 5.2.4.4'
 gem 'sprockets', '~> 3.7.2'
-gem 'thor', '~> 0.20'
+gem 'thor', '~> 1.0'
 gem 'rack', '~> 2.2.3'
-
-gem 'thwait', '~> 0.2.0'
-gem 'e2mmap', '~> 0.1.0'
 
 gem 'hamlit-rails', '~> 0.2'
 gem 'pg', '~> 1.2'
@@ -20,7 +17,7 @@ gem 'makara', '~> 0.4'
 gem 'pghero', '~> 2.7'
 gem 'dotenv-rails', '~> 2.7'
 
-gem 'aws-sdk-s3', '~> 1.79', require: false
+gem 'aws-sdk-s3', '~> 1.85', require: false
 gem 'fog-core', '<= 2.1.0'
 gem 'fog-openstack', '~> 0.3', require: false
 gem 'paperclip', '~> 6.0'
@@ -30,7 +27,7 @@ gem 'blurhash', '~> 0.1'
 
 gem 'active_model_serializers', '~> 0.10'
 gem 'addressable', '~> 2.7'
-gem 'bootsnap', '~> 1.4', require: false
+gem 'bootsnap', '~> 1.5', require: false
 gem 'browser'
 gem 'charlock_holmes', '~> 0.7.7'
 gem 'iso-639'
@@ -44,9 +41,10 @@ group :pam_authentication, optional: true do
 end
 
 gem 'net-ldap', '~> 0.16'
-gem 'omniauth-cas', '~> 1.1'
+gem 'omniauth-cas', '~> 2.0'
 gem 'omniauth-saml', '~> 1.10'
 gem 'omniauth', '~> 1.9'
+gem 'omniauth-rails_csrf_protection', '~> 0.1'
 
 gem 'color_diff', '~> 0.1'
 gem 'discard', '~> 1.2'
@@ -54,7 +52,6 @@ gem 'doorkeeper', '~> 5.4'
 gem 'ed25519', '~> 1.2'
 gem 'fast_blank', '~> 1.0'
 gem 'fastimage'
-gem 'goldfinger', '~> 2.1'
 gem 'hiredis', '~> 0.6'
 gem 'redis-namespace', '~> 1.8'
 gem 'health_check', git: 'https://github.com/ianheggie/health_check', ref: '0b799ead604f900ed50685e9b2d469cd2befba5b'
@@ -72,7 +69,7 @@ gem 'nsa', '~> 0.2'
 gem 'oj', '~> 3.10'
 gem 'ox', '~> 2.13'
 gem 'parslet'
-gem 'parallel', '~> 1.19'
+gem 'parallel', '~> 1.20'
 gem 'posix-spawn'
 gem 'pundit', '~> 2.1'
 gem 'premailer-rails'
@@ -121,28 +118,28 @@ end
 group :test do
   gem 'capybara', '~> 3.33'
   gem 'climate_control', '~> 0.2'
-  gem 'faker', '~> 2.13'
+  gem 'faker', '~> 2.14'
   gem 'microformats', '~> 4.2'
   gem 'rails-controller-testing', '~> 1.0'
   gem 'rspec-sidekiq', '~> 3.1'
   gem 'simplecov', '~> 0.19', require: false
-  gem 'webmock', '~> 3.8'
-  gem 'parallel_tests', '~> 3.2'
+  gem 'webmock', '~> 3.10'
+  gem 'parallel_tests', '~> 3.4'
   gem 'rspec_junit_formatter', '~> 0.4'
 end
 
 group :development do
-  gem 'active_record_query_trace', '~> 1.7'
+  gem 'active_record_query_trace', '~> 1.8'
   gem 'annotate', '~> 3.1'
-  gem 'better_errors', '~> 2.7'
+  gem 'better_errors', '~> 2.9'
   gem 'binding_of_caller', '~> 0.7'
   gem 'bullet', '~> 6.1'
   gem 'letter_opener', '~> 1.7'
   gem 'letter_opener_web', '~> 1.4'
   gem 'memory_profiler'
-  gem 'rubocop', '~> 0.90', require: false
+  gem 'rubocop', '~> 1.3', require: false
   gem 'rubocop-rails', '~> 2.8', require: false
-  gem 'brakeman', '~> 4.9', require: false
+  gem 'brakeman', '~> 4.10', require: false
   gem 'bundler-audit', '~> 0.7', require: false
 
   gem 'capistrano', '~> 3.14'
@@ -160,3 +157,6 @@ end
 
 gem 'concurrent-ruby', require: false
 gem 'connection_pool', require: false
+
+gem 'xorcist', '~> 1.1'
+gem 'pluck_each', '~> 0.1.3'
