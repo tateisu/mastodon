@@ -63,7 +63,7 @@ RUN apt update && \
 ENV PATH="${PATH}:/opt/ruby/bin:/opt/node/bin"
 
 RUN npm install -g yarn && \
-    	gem install bundler && \
+	gem install bundler && \
 	apt update && \
 	apt -y install git libicu-dev libidn11-dev \
 	libpq-dev libprotobuf-dev protobuf-compiler
@@ -134,7 +134,7 @@ ENV BIND="0.0.0.0"
 USER mastodon
 
 # Precompile assets
-# RUN cd ~ && \
+#RUN cd ~ && \
 #	OTP_SECRET=precompile_placeholder SECRET_KEY_BASE=precompile_placeholder rails assets:precompile && \
 #	yarn cache clean
 
