@@ -5,7 +5,7 @@ services:
 
   db_backend:
     restart: always
-    image: postgres:11.1-alpine
+    image: postgres:11.10-alpine
     shm_size: 256mb
     networks:
       - internal_network
