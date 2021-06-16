@@ -42,8 +42,9 @@ import {
 } from '../../actions/domain_blocks';
 import { initMuteModal } from '../../actions/mutes';
 import { initBlockModal } from '../../actions/blocks';
+import { initBoostModal } from '../../actions/boosts';
 import { initReport } from '../../actions/reports';
-import { makeGetStatus } from '../../selectors';
+import { makeGetStatus, makeGetPictureInPicture } from '../../selectors';
 import { ScrollContainer } from 'react-router-scroll-4';
 import ColumnBackButton from '../../components/column_back_button';
 import ColumnHeader from '../../components/column_header';
@@ -72,6 +73,7 @@ const messages = defineMessages({
 
 const makeMapStateToProps = () => {
   const getStatus = makeGetStatus();
+  const getPictureInPicture = makeGetPictureInPicture();
 
   const getAncestorsIds = createSelector([
     (_, { id }) => id,
@@ -129,11 +131,12 @@ const makeMapStateToProps = () => {
 
   const mapStateToProps = (state, props) => {
     const status = getStatus(state, { id: props.params.statusId });
-    let ancestorsIds = Immutable.List();
+
+    let ancestorsIds   = Immutable.List();
     let descendantsIds = Immutable.List();
 
     if (status) {
-      ancestorsIds = getAncestorsIds(state, { id: status.get('in_reply_to_id') });
+      ancestorsIds   = getAncestorsIds(state, { id: status.get('in_reply_to_id') });
       descendantsIds = getDescendantsIds(state, { id: status.get('id') });
     }
 
@@ -143,7 +146,7 @@ const makeMapStateToProps = () => {
       descendantsIds,
       askReplyConfirmation: state.getIn(['compose', 'text']).trim().length !== 0,
       domain: state.getIn(['meta', 'domain']),
-      usingPiP: state.get('picture_in_picture').statusId === props.params.statusId,
+      pictureInPicture: getPictureInPicture(state, { id: props.params.statusId }),
     };
   };
 
@@ -168,7 +171,10 @@ class Status extends ImmutablePureComponent {
     askReplyConfirmation: PropTypes.bool,
     multiColumn: PropTypes.bool,
     domain: PropTypes.string.isRequired,
-    usingPiP: PropTypes.bool,
+    pictureInPicture: ImmutablePropTypes.contains({
+      inUse: PropTypes.bool,
+      available: PropTypes.bool,
+    }),
   };
 
   state = {
@@ -229,8 +235,8 @@ class Status extends ImmutablePureComponent {
     }
   }
 
-  handleModalReblog = (status) => {
-    this.props.dispatch(reblog(status));
+  handleModalReblog = (status, privacy) => {
+    this.props.dispatch(reblog(status, privacy));
   }
 
   handleReblogClick = (status, e) => {
@@ -240,7 +246,7 @@ class Status extends ImmutablePureComponent {
       if ((e && e.shiftKey) || !boostModal) {
         this.handleModalReblog(status);
       } else {
-        this.props.dispatch(openModal('BOOST', { status, onReblog: this.handleModalReblog }));
+        this.props.dispatch(initBoostModal({ status, onReblog: this.handleModalReblog }));
       }
     }
   }
@@ -492,7 +498,7 @@ class Status extends ImmutablePureComponent {
 
   render () {
     let ancestors, descendants;
-    const { shouldUpdateScroll, status, ancestorsIds, descendantsIds, intl, domain, multiColumn, usingPiP } = this.props;
+    const { shouldUpdateScroll, status, ancestorsIds, descendantsIds, intl, domain, multiColumn, pictureInPicture } = this.props;
     const { fullscreen } = this.state;
 
     if (status === null) {
@@ -550,7 +556,7 @@ class Status extends ImmutablePureComponent {
                   domain={domain}
                   showMedia={this.state.showMedia}
                   onToggleMediaVisibility={this.handleToggleMediaVisibility}
-                  usingPiP={usingPiP}
+                  pictureInPicture={pictureInPicture}
                 />
 
                 <ActionBar

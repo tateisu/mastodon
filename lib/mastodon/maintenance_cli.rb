@@ -14,7 +14,7 @@ module Mastodon
     end
 
     MIN_SUPPORTED_VERSION = 2019_10_01_213028
-    MAX_SUPPORTED_VERSION = 2020_10_17_234926
+    MAX_SUPPORTED_VERSION = 2021_05_26_193025
 
     # Stubs to enjoy ActiveRecord queries while not depending on a particular
     # version of the code/database
@@ -42,6 +42,8 @@ module Mastodon
     class CustomEmojiCategory < ApplicationRecord; end
     class Bookmark < ApplicationRecord; end
     class WebauthnCredential < ApplicationRecord; end
+    class FollowRecommendationSuppression < ApplicationRecord; end
+    class CanonicalEmailBlock < ApplicationRecord; end
 
     class PreviewCard < ApplicationRecord
       self.inheritance_column = false
@@ -55,8 +57,8 @@ module Mastodon
       belongs_to :account, inverse_of: :account_stat
     end
 
+    # Dummy class, to make migration possible across version changes
     class Account < ApplicationRecord
-      # Dummy class, to make migration possible across version changes
       has_one :user, inverse_of: :account
       has_one :account_stat, inverse_of: :account
 
@@ -68,6 +70,56 @@ module Mastodon
 
       def acct
         local? ? username : "#{username}@#{domain}"
+      end
+
+      # This is a duplicate of the AccountMerging concern because we need it to
+      # be independent from code version.
+      def merge_with!(other_account)
+        # Since it's the same remote resource, the remote resource likely
+        # already believes we are following/blocking, so it's safe to
+        # re-attribute the relationships too. However, during the presence
+        # of the index bug users could have *also* followed the reference
+        # account already, therefore mass update will not work and we need
+        # to check for (and skip past) uniqueness errors
+
+        owned_classes = [
+          Status, StatusPin, MediaAttachment, Poll, Report, Tombstone, Favourite,
+          Follow, FollowRequest, Block, Mute, AccountIdentityProof,
+          AccountModerationNote, AccountPin, AccountStat, ListAccount,
+          PollVote, Mention
+        ]
+        owned_classes << AccountDeletionRequest if ActiveRecord::Base.connection.table_exists?(:account_deletion_requests)
+        owned_classes << AccountNote if ActiveRecord::Base.connection.table_exists?(:account_notes)
+        owned_classes << FollowRecommendationSuppression if ActiveRecord::Base.connection.table_exists?(:follow_recommendation_suppressions)
+
+        owned_classes.each do |klass|
+          klass.where(account_id: other_account.id).find_each do |record|
+            begin
+              record.update_attribute(:account_id, id)
+            rescue ActiveRecord::RecordNotUnique
+              next
+            end
+          end
+        end
+
+        target_classes = [Follow, FollowRequest, Block, Mute, AccountModerationNote, AccountPin]
+        target_classes << AccountNote if ActiveRecord::Base.connection.table_exists?(:account_notes)
+
+        target_classes.each do |klass|
+          klass.where(target_account_id: other_account.id).find_each do |record|
+            begin
+              record.update_attribute(:target_account_id, id)
+            rescue ActiveRecord::RecordNotUnique
+              next
+            end
+          end
+        end
+
+        if ActiveRecord::Base.connection.table_exists?(:canonical_email_blocks)
+          CanonicalEmailBlock.where(reference_account_id: other_account.id).find_each do |record|
+            record.update_attribute(:reference_account_id, id)
+          end
+        end
       end
     end
 
@@ -99,7 +151,6 @@ module Mastodon
       @prompt.warn 'Please make sure to stop Mastodon and have a backup.'
       exit(1) unless @prompt.yes?('Continue?')
 
-      deduplicate_accounts!
       deduplicate_users!
       deduplicate_account_domain_blocks!
       deduplicate_account_identity_proofs!
@@ -114,9 +165,11 @@ module Mastodon
       deduplicate_media_attachments!
       deduplicate_preview_cards!
       deduplicate_statuses!
+      deduplicate_accounts!
       deduplicate_tags!
       deduplicate_webauthn_credentials!
 
+      Scenic.database.refresh_materialized_view('instances', concurrently: true, cascade: false) if ActiveRecord::Migrator.current_version >= 2020_12_06_004238
       Rails.cache.clear
 
       @prompt.say 'Finished!'
@@ -145,6 +198,11 @@ module Mastodon
       else
         ActiveRecord::Base.connection.add_index :accounts, "lower (username), COALESCE(lower(domain), '')", name: 'index_accounts_on_username_and_domain_lower', unique: true
       end
+
+      @prompt.say 'Reindexing textual indexes on accounts…'
+      ActiveRecord::Base.connection.execute('REINDEX INDEX search_index;')
+      ActiveRecord::Base.connection.execute('REINDEX INDEX index_accounts_on_uri;')
+      ActiveRecord::Base.connection.execute('REINDEX INDEX index_accounts_on_url;')
     end
 
     def deduplicate_users!
@@ -417,6 +475,11 @@ module Mastodon
 
       @prompt.say 'Restoring tags indexes…'
       ActiveRecord::Base.connection.add_index :tags, 'lower((name)::text)', name: 'index_tags_on_name_lower', unique: true
+
+      if ActiveRecord::Base.connection.indexes(:tags).any? { |i| i.name == 'index_tags_on_name_lower_btree' }
+        @prompt.say 'Reindexing textual indexes on tags…'
+        ActiveRecord::Base.connection.execute('REINDEX INDEX index_tags_on_name_lower_btree;')
+      end
     end
 
     def deduplicate_webauthn_credentials!

@@ -12,6 +12,7 @@ class UnsuspendAccountService < BaseService
     merge_into_home_timelines!
     merge_into_list_timelines!
     publish_media_attachments!
+    distribute_update_actor!
   end
 
   private
@@ -36,6 +37,16 @@ class UnsuspendAccountService < BaseService
     # @account would now be nil.
   end
 
+  def distribute_update_actor!
+    return unless @account.local?
+
+    account_reach_finder = AccountReachFinder.new(@account)
+
+    ActivityPub::DeliveryWorker.push_bulk(account_reach_finder.inboxes) do |inbox_url|
+      [signed_activity_json, @account.id, inbox_url]
+    end
+  end
+
   def merge_into_home_timelines!
     @account.followers_for_local_distribution.find_each do |follower|
       FeedManager.instance.merge_into_home(@account, follower)
@@ -56,10 +67,16 @@ class UnsuspendAccountService < BaseService
         attachment = media_attachment.public_send(attachment_name)
         styles     = [:original] | attachment.styles.keys
 
+        next if attachment.blank?
+
         styles.each do |style|
           case Paperclip::Attachment.default_options[:storage]
           when :s3
-            attachment.s3_object(style).acl.put(acl: Paperclip::Attachment.default_options[:s3_permissions])
+            begin
+              attachment.s3_object(style).acl.put(acl: Paperclip::Attachment.default_options[:s3_permissions])
+            rescue Aws::S3::Errors::NoSuchKey
+              Rails.logger.warn "Tried to change acl on non-existent key #{attachment.s3_object(style).key}"
+            end
           when :fog
             # Not supported
           when :filesystem
@@ -74,5 +91,9 @@ class UnsuspendAccountService < BaseService
         end
       end
     end
+  end
+
+  def signed_activity_json
+    @signed_activity_json ||= Oj.dump(serialize_payload(@account, ActivityPub::UpdateSerializer, signer: @account))
   end
 end
