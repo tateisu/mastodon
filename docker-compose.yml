@@ -59,7 +59,7 @@ services:
 
   web:
     build: .
-    image: tootsuite/mastodon
+    image: tateisu/m1j
     restart: always
     env_file: .env.production
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
@@ -83,7 +83,7 @@ services:
 
   streaming:
     build: .
-    image: tootsuite/mastodon
+    image: tateisu/m1j
     restart: always
     env_file: .env.production
     command: node ./streaming
@@ -100,7 +100,7 @@ services:
 
   sidekiq_pull:
     build: .
-    image: tootsuite/mastodon
+    image: tateisu/m1j
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
@@ -120,7 +120,7 @@ services:
 
   sidekiq_push:
     build: .
-    image: tootsuite/mastodon
+    image: tateisu/m1j
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
@@ -140,7 +140,7 @@ services:
 
   sidekiq_default:
     build: .
-    image: tootsuite/mastodon
+    image: tateisu/m1j
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
