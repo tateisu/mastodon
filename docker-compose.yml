@@ -53,11 +53,12 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:3000/health || exit 1"]
     ports:
-      - "3002:3000"
+      - "192.168.3.1:3002:3000"
     depends_on:
 #      - db
       - redis
 #      - es
+      - delay
     volumes:
       - ../public/assets:/mastodon/public/assets
       - ../public/packs:/mastodon/public/packs
@@ -75,10 +76,11 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:4000/api/v1/streaming/health || exit 1"]
     ports:
-      - "3003:4000"
+      - "192.168.3.1:3003:4000"
     depends_on:
 #      - db
       - redis
+      - delay
 
   sidekiq:
     build: .
@@ -89,6 +91,7 @@ services:
     depends_on:
 #      - db
       - redis
+      - delay
     networks:
       - external_network
       - internal_network
@@ -112,6 +115,20 @@ services:
 #    networks:
 #      - external_network
 #      - internal_network
+
+  delay:
+    # ubuntu 18.04未満ではncコマンドがプリインストールされている
+    image: ubuntu:14.04
+    command: >
+      /bin/bash -c "
+        while ! nc -z din2 5431;
+        do
+          echo sleeping;
+          sleep 1;
+        done;
+        echo Connected!;
+        sleep 10;
+      "
 
 networks:
   external_network:

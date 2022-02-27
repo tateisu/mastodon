@@ -62,7 +62,7 @@ class Rack::Attack
     req.remote_ip if req.path.start_with?('/media_proxy')
   end
 
-  throttle('throttle_api_sign_up', limit: 5, period: 30.minutes) do |req|
+  throttle('throttle_api_sign_up', limit: 999, period: 30.minutes) do |req|
     req.remote_ip if req.post? && req.path == '/api/v1/accounts'
   end
 
@@ -97,7 +97,7 @@ class Rack::Attack
     req.remote_ip if req.post? && %w(/auth/confirmation /api/v1/emails/confirmations).include?(req.path)
   end
 
-  throttle('throttle_email_confirmations/email', limit: 5, period: 30.minutes) do |req|
+  throttle('throttle_email_confirmations/email', limit: 999, period: 30.minutes) do |req|
     if req.post? && req.path == '/auth/password'
       req.params.dig('user', 'email').presence
     elsif req.post? && req.path == '/api/v1/emails/confirmations'
