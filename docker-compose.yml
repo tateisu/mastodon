@@ -12,6 +12,21 @@ services:
 #    volumes:
 #      - ../postgres:/var/lib/postgresql/data
 
+  delay:
+    # ubuntu 18.04未満ではncコマンドがプリインストールされている
+    image: ubuntu:14.04
+    command: >
+      /bin/bash -c "
+        while ! nc -z din2 5431;
+        do
+          echo sleeping;
+          sleep 1;
+        done;
+        echo Connected!;
+        sleep 10;
+      "
+      
+
   redis:
     restart: always
     image: redis:6.0-alpine
@@ -53,11 +68,12 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:3000/health || exit 1"]
     ports:
-      - "3004:3000"
+      - "192.168.3.1:3004:3000"
     depends_on:
 #      - db
       - redis
 #      - es
+      - delay
     volumes:
       - ../public/assets:/mastodon/public/assets
       - ../public/packs:/mastodon/public/packs
@@ -75,10 +91,11 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:4000/api/v1/streaming/health || exit 1"]
     ports:
-      - "3005:4000"
+      - "192.168.3.1:3005:4000"
     depends_on:
 #      - db
       - redis
+      - delay
 
   sidekiq:
     build: .
@@ -89,6 +106,7 @@ services:
     depends_on:
 #      - db
       - redis
+      - delay
     networks:
       - external_network
       - internal_network
