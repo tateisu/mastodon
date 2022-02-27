@@ -46,7 +46,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     return reject_payload! if unsupported_object_type? || invalid_origin?(object_uri) || tombstone_exists? || !related_to_local_activity?
 
     lock_or_fail("create:#{object_uri}") do
-      return if delete_arrived_first?(object_uri) || poll_vote? # rubocop:disable Lint/NonLocalExitFromIterator
+      return if delete_arrived_first?(object_uri) || poll_vote?
 
       @status = find_existing_status
 
@@ -446,8 +446,12 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def supported_blurhash?(blurhash)
-    components = blurhash.blank? ? nil : Blurhash.components(blurhash)
+    components = blurhash.blank? || !blurhash_valid_chars?(blurhash) ? nil : Blurhash.components(blurhash)
     components.present? && components.none? { |comp| comp > 5 }
+  end
+
+  def blurhash_valid_chars?(blurhash)
+    /^[\w#$%*+-.:;=?@\[\]^{|}~]+$/.match?(blurhash)
   end
 
   def skip_download?

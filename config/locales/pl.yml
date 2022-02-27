@@ -457,6 +457,7 @@ pl:
         title: Nowa blokada domeny e-mail
       title: Blokowanie domen e-mail
     follow_recommendations:
+      description_html: "<strong>Polecane śledzenia pomagają nowym użytkownikom szybko odnaleźć interesujące treści</strong>. Jeżeli użytkownik nie wchodził w interakcje z innymi wystarczająco często, aby powstały spersonalizowane rekomendacje, polecane są te konta. Są one obliczane każdego dnia na podstawie kombinacji kont o największej liczbie niedawnej aktywności i największej liczbie lokalnych obserwatorów dla danego języka."
       language: Dla języka
       status: Stan
       suppress: Usuń polecenie śledzenia
@@ -477,6 +478,11 @@ pl:
         unavailable: Niedostępne
         unavailable_message: Doręczaniei niedostępne
         warning: Ostrzeżenie
+        warning_message:
+          few: "%{count} dni niepowodzenia doręczenia"
+          many: "%{count} dni niepowodzenia doręczenia"
+          one: "%{count} dzień niepowodzenia doręczenia"
+          other: "%{count} dni niepowodzenia doręczenia"
       delivery_available: Doręczanie jest dostępne
       delivery_error_days: Dni błędów doręczenia
       delivery_error_hint: Jeżeli doręczanie nie będzie możliwe przez %{count} dni, zostanie automatycznie oznaczona jako nie do doręczania.
