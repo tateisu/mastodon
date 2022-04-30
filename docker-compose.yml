@@ -1,6 +1,6 @@
 version: '3'
 services:
-  db:
+  db_backend:
     restart: always
     image: postgres:14-alpine
     shm_size: 256mb
@@ -9,9 +9,22 @@ services:
     healthcheck:
       test: ['CMD', 'pg_isready', '-U', 'postgres']
     volumes:
-      - ./postgres14:/var/lib/postgresql/data
+      - ../postgres14:/var/lib/postgresql/data
     environment:
       - 'POSTGRES_HOST_AUTH_METHOD=trust'
+
+  db:
+    restart: always
+    image: gavinmroy/alpine-pgbouncer:1.7.2
+    networks:
+      - internal_network
+    volumes:
+      - ../pgbouncer:/etc/pgbouncer
+    depends_on:
+      - db_backend
+## expose port for munin
+    ports:
+      - "172.17.0.1:5432:5432"
 
   redis:
     restart: always
@@ -21,7 +34,7 @@ services:
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
     volumes:
-      - ./redis:/data
+      - ../redis:/data
 
   # es:
   #   restart: always
@@ -44,7 +57,7 @@ services:
 
   web:
     build: .
-    image: tootsuite/mastodon
+    image: tateisu/m1j
     restart: always
     env_file: .env.production
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
@@ -55,17 +68,21 @@ services:
       # prettier-ignore
       test: ['CMD-SHELL', 'wget -q --spider --proxy=off localhost:3000/health || exit 1']
     ports:
-      - '127.0.0.1:3000:3000'
+      - "172.17.0.1:3000:3000"
     depends_on:
       - db
       - redis
       # - es
     volumes:
-      - ./public/system:/mastodon/public/system
+      - /etc/localtime:/etc/localtime:ro
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
 
   streaming:
     build: .
-    image: tootsuite/mastodon
+    image: tateisu/m1j
     restart: always
     env_file: .env.production
     command: node ./streaming
@@ -76,14 +93,14 @@ services:
       # prettier-ignore
       test: ['CMD-SHELL', 'wget -q --spider --proxy=off localhost:4000/api/v1/streaming/health || exit 1']
     ports:
-      - '127.0.0.1:4000:4000'
+      - "172.17.0.1:4000:4000"
     depends_on:
       - db
       - redis
 
-  sidekiq:
+  sidekiq_pull:
     build: .
-    image: tootsuite/mastodon
+    image: tateisu/m1j
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
@@ -94,7 +111,56 @@ services:
       - external_network
       - internal_network
     volumes:
-      - ./public/system:/mastodon/public/system
+      - /etc/localtime:/etc/localtime:ro
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-pull.yml:/mastodon/config/sidekiq.yml:ro
+    healthcheck:
+      test: ['CMD-SHELL', "ps aux | grep '[s]idekiq\ 6' || false"]
+
+  sidekiq_push:
+    build: .
+    image: tateisu/m1j
+    restart: always
+    env_file: .env.production
+    command: bundle exec sidekiq
+    depends_on:
+      - db
+      - redis
+    networks:
+      - external_network
+      - internal_network
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-push.yml:/mastodon/config/sidekiq.yml:ro
+    healthcheck:
+      test: ['CMD-SHELL', "ps aux | grep '[s]idekiq\ 6' || false"]
+
+  sidekiq_default:
+    build: .
+    image: tateisu/m1j
+    restart: always
+    env_file: .env.production
+    command: bundle exec sidekiq
+    depends_on:
+      - db
+      - redis
+    networks:
+      - external_network
+      - internal_network
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+      - ../public/assets:/mastodon/public/assets
+      - ../public/system:/mastodon/public/system
+      - ../public/packs:/mastodon/public/packs
+      - ./config/sidekiq-default.yml:/mastodon/config/sidekiq.yml:ro
     healthcheck:
       test: ['CMD-SHELL', "ps aux | grep '[s]idekiq\ 6' || false"]
 
@@ -118,4 +184,5 @@ services:
 networks:
   external_network:
   internal_network:
-    internal: true
+    # for access from munin
+    # internal: true

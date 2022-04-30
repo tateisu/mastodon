@@ -7,13 +7,15 @@ class FeedManager
   include Redisable
 
   # Maximum number of items stored in a single feed
-  MAX_ITEMS = 400
+  MAX_ITEMS = ENV['FEED_MAX_ITEMS'].present? ? ENV['FEED_MAX_ITEMS'].to_i : 400
+  QUERY_LIMIT = [100,MAX_ITEMS/4].min
+  TRIM_INTERVAL = ENV['FEED_TRIM_INTERVAL'].present? ? ENV['FEED_TRIM_INTERVAL'].to_i : 1
 
   # Number of items in the feed since last reblog of status
   # before the new reblog will be inserted. Must be <= MAX_ITEMS
   # or the tracking sets will grow forever
-  REBLOG_FALLOFF = 40
-
+  REBLOG_FALLOFF = [40,MAX_ITEMS/10].min
+  
   # Execute block for every active account
   # @yield [Account]
   # @return [void]
@@ -107,7 +109,7 @@ class FeedManager
   def merge_into_home(from_account, into_account)
     timeline_key = key(:home, into_account.id)
     aggregate    = into_account.user&.aggregates_reblogs?
-    query        = from_account.statuses.where(visibility: [:public, :unlisted, :private]).includes(:preloadable_poll, reblog: :account).limit(FeedManager::MAX_ITEMS / 4)
+    query        = from_account.statuses.where(visibility: [:public, :unlisted, :private]).includes(:preloadable_poll, reblog: :account).limit(FeedManager::QUERY_LIMIT)
 
     if redis.zcard(timeline_key) >= FeedManager::MAX_ITEMS / 4
       oldest_home_score = redis.zrange(timeline_key, 0, 0, with_scores: true).first.last.to_i
@@ -133,7 +135,7 @@ class FeedManager
   def merge_into_list(from_account, list)
     timeline_key = key(:list, list.id)
     aggregate    = list.account.user&.aggregates_reblogs?
-    query        = from_account.statuses.where(visibility: [:public, :unlisted, :private]).includes(:preloadable_poll, reblog: :account).limit(FeedManager::MAX_ITEMS / 4)
+    query        = from_account.statuses.where(visibility: [:public, :unlisted, :private]).includes(:preloadable_poll, reblog: :account).limit(FeedManager::QUERY_LIMIT)
 
     if redis.zcard(timeline_key) >= FeedManager::MAX_ITEMS / 4
       oldest_home_score = redis.zrange(timeline_key, 0, 0, with_scores: true).first.last.to_i
@@ -304,6 +306,8 @@ class FeedManager
     timeline_key = key(type, timeline_id)
     reblog_key   = key(type, timeline_id, 'reblogs')
 
+    return unless redis.zcard(key(type, timeline_id)) >= FeedManager::MAX_ITEMS + FeedManager::TRIM_INTERVAL
+    
     # Remove any items past the MAX_ITEMS'th entry in our feed
     redis.zremrangebyrank(timeline_key, 0, -(FeedManager::MAX_ITEMS + 1))
 
