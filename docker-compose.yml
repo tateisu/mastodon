@@ -5,12 +5,18 @@ services:
     restart: always
     image: postgres:14-alpine
     shm_size: 256mb
-    networks:
-      - internal_network
     healthcheck:
       test: ['CMD', 'pg_isready', '-U', 'postgres']
     volumes:
       - ../postgres14:/var/lib/postgresql/data
+    networks:
+      - internal_network
+#      - external_network
+#    ports:
+#      - "172.17.0.1:9999:5432"
+## 一時的にポートマッピングして
+## docker-compose up -d db_backend でDBだけ起動
+## pg_dumpall -h 172.17.0.1 -p 9999 -U postgres -f 20230121-mast-db
 
 #  db_backend11:
 #    restart: always

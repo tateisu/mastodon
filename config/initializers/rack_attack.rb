@@ -41,6 +41,10 @@ class Rack::Attack
       path.start_with?('/api')
     end
 
+    def unsilence?
+      /\A\/api\/v1\/admin\/accounts\/\d+\/unsilence\z/ =~ path
+    end
+
     def path_matches?(other_path)
       /\A#{Regexp.escape(other_path)}(\..*)?\z/ =~ path
     end
@@ -56,6 +60,10 @@ class Rack::Attack
 
   Rack::Attack.safelist('allow from localhost') do |req|
     req.remote_ip == '127.0.0.1' || req.remote_ip == '::1'
+  end
+
+  Rack::Attack.safelist('allow unsilence') do |req|
+    req.unsilence?
   end
 
   Rack::Attack.blocklist('deny from blocklist') do |req|
