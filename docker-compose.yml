@@ -93,7 +93,7 @@ services:
       # - es
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+#      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
       - ../public/packs:/mastodon/public/packs
@@ -130,7 +130,7 @@ services:
       - internal_network
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+#      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
       - ../public/packs:/mastodon/public/packs
@@ -152,7 +152,7 @@ services:
       - internal_network
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+#      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
       - ../public/packs:/mastodon/public/packs
@@ -174,7 +174,7 @@ services:
       - internal_network
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
+#      - ../etc-ImageMagick-7:/etc/ImageMagick-7:ro
       - ../public/assets:/mastodon/public/assets
       - ../public/system:/mastodon/public/system
       - ../public/packs:/mastodon/public/packs
