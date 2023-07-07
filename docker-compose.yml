@@ -74,8 +74,7 @@ services:
   #     - '127.0.0.1:9200:9200'
 
   web:
-    build: .
-    image: tateisu/m1j
+    image: tateisu/m1j:production
     restart: always
     env_file: .env.production
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
@@ -99,8 +98,7 @@ services:
       - ../public/packs:/mastodon/public/packs
 
   streaming:
-    build: .
-    image: tateisu/m1j
+    image: tateisu/m1j:production
     restart: always
     env_file: .env.production
     command: node ./streaming
@@ -117,8 +115,7 @@ services:
       - redis
 
   sidekiq_pull:
-    build: .
-    image: tateisu/m1j
+    image: tateisu/m1j:production
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
@@ -139,8 +136,7 @@ services:
       test: ['CMD-SHELL', "ps aux | grep '[s]idekiq\ 6' || false"]
 
   sidekiq_push:
-    build: .
-    image: tateisu/m1j
+    image: tateisu/m1j:production
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq
@@ -161,8 +157,7 @@ services:
       test: ['CMD-SHELL', "ps aux | grep '[s]idekiq\ 6' || false"]
 
   sidekiq_default:
-    build: .
-    image: tateisu/m1j
+    image: tateisu/m1j:production
     restart: always
     env_file: .env.production
     command: bundle exec sidekiq

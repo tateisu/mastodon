@@ -1,0 +1,33 @@
+#!/bin/bash
+set -eux
+
+date
+echo "# down the services..."
+docker compose down
+
+date
+echo "# build container image..."
+docker build -t tateisu/m1j:production .
+
+date
+echo "# DB migration..."
+docker compose run --rm web rails db:migrate
+
+date
+echo "# compile assets..."
+docker compose run --rm -e OTP_SECRET=precompile_placeholder -e SECRET_KEY_BASE=precompile_placeholder web rails assets:precompile
+
+date
+echo "# up the services..."
+docker compose up -d
+
+date
+echo "# waiting service start..."
+sleep 30
+
+# date
+# echo "# DB migration (post deployment)..."
+# docker-compose run --rm web rails db:migrate
+
+date
+echo "service started."
