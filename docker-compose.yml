@@ -41,6 +41,8 @@ services:
       test: ['CMD', 'redis-cli', 'ping']
     volumes:
       - ../redis:/data
+    ports:
+      - "172.17.0.1:6379:6379"
 
   # es:
   #   restart: always

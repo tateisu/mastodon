@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eux
 
+# disable color output of docker. 
+export NO_COLOR=1
+
 date
 echo "# down the services..."
 docker compose down
