@@ -17,6 +17,10 @@ echo "# DB migration..."
 docker compose run --rm web rails db:migrate
 
 date
+echo "# delete assets..."
+docker compose run --rm web rails assets:clobber
+
+date
 echo "# compile assets..."
 docker compose run --rm -e OTP_SECRET=precompile_placeholder -e SECRET_KEY_BASE=precompile_placeholder web rails assets:precompile
 
