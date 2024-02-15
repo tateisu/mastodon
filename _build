@@ -18,7 +18,8 @@ docker compose run --rm web rails db:migrate
 
 date
 echo "# delete assets..."
-docker compose run --rm web rails assets:clobber
+# docker compose run --rm web rails assets:clobber
+docker compose run --rm web rails assets:clean
 
 date
 echo "# compile assets..."
