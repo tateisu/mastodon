@@ -49,6 +49,10 @@ class Rack::Attack
       path.start_with?('/api')
     end
 
+    def unsilence?
+      /\A\/api\/v1\/admin\/accounts\/\d+\/unsilence\z/ =~ path
+    end
+
     def path_matches?(other_path)
       /\A#{Regexp.escape(other_path)}(\..*)?\z/ =~ path
     end
