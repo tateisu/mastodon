@@ -59,6 +59,7 @@ module Mastodon::CLI
             end
           rescue => e
             progress.log pastel.red("Error processing #{item.id}: #{e}")
+            progress.log e.full_message
           ensure
             progress.increment
           end
