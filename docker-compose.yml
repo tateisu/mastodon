@@ -1,6 +1,5 @@
 # This file is designed for production server deployment, not local development work
 # For a containerized local dev environment, see: https://github.com/mastodon/mastodon/blob/main/docs/DEVELOPMENT.md#docker
-
 services:
   # es:
   #   restart: always
@@ -49,7 +48,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ../public/system:/mastodon/public/system
 
-streaming:
+  streaming:
     # You can uncomment the following lines if you want to not use the prebuilt image, for example if you have local code changes
     # build:
     #   dockerfile: ./streaming/Dockerfile
